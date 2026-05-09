@@ -1,6 +1,12 @@
 import sys
 import os
 
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 # Add parent directory to path to import plot_style
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from plot_style import set_tufte_defaults, apply_tufte_style, save_tufte_figure, COLORS
@@ -32,16 +38,16 @@ from tda_utils import setup_tufte_plot, TufteColors
 
 
 
-print("=" * 70)
-print("Blog 26: ROW Vegetation Clustering - Visualizations")
-print("=" * 70)
+logger.info("=" * 70)
+logger.info("Blog 26: ROW Vegetation Clustering - Visualizations")
+logger.info("=" * 70)
 
 plt.rcParams['font.family'] = 'serif'
 
 # ============================================================================
 # Generate Synthetic ROW Tile Data
 # ============================================================================
-print("\nGenerating synthetic ROW tile data...")
+logger.info("\nGenerating synthetic ROW tile data...")
 
 np.random.seed(9)
 N_tiles = 150
@@ -80,12 +86,12 @@ df_row.loc[thermal_idx, 'ndvi_mean'] = np.random.uniform(0.25, 0.40, 15)
 df_row.loc[thermal_idx, 'bare_soil_fraction'] = np.random.uniform(0.50, 0.70, 15)
 df_row.loc[thermal_idx, 'thermal_anomaly_score'] = np.random.uniform(0.35, 0.55, 15)
 
-print(f"✓ Generated {len(df_row)} tiles")
+logger.info(f"✓ Generated {len(df_row)} tiles")
 
 # ============================================================================
 # Visualization 1: Dendrogram
 # ============================================================================
-print("\nGenerating ROW vegetation dendrogram...")
+logger.info("\nGenerating ROW vegetation dendrogram...")
 
 set_tufte_defaults()
 
@@ -115,12 +121,12 @@ apply_tufte_style(ax, show_grid=False)
 plt.tight_layout()
 save_tufte_figure('26_row_vegetation_dendrogram.png')
 plt.close()
-print("✓ Dendrogram saved")
+logger.info("✓ Dendrogram saved")
 
 # ============================================================================
 # Visualization 2: Cluster Spatial Distribution
 # ============================================================================
-print("Generating cluster spatial distribution map...")
+logger.info("Generating cluster spatial distribution map...")
 
 n_clusters = 5
 clustering = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
@@ -157,12 +163,12 @@ apply_tufte_style(ax, show_grid=False)
 plt.tight_layout()
 save_tufte_figure('26_row_clusters_spatial.png')
 plt.close()
-print("✓ Spatial distribution map saved")
+logger.info("✓ Spatial distribution map saved")
 
 # ============================================================================
 # Visualization 3: Cluster Profiles (Feature Comparison)
 # ============================================================================
-print("Generating cluster profile comparison...")
+logger.info("Generating cluster profile comparison...")
 
 cluster_profiles = df_row.groupby('cluster_id')[features].mean()
 
@@ -204,28 +210,28 @@ apply_tufte_style(ax3, show_grid=False)
 plt.tight_layout()
 save_tufte_figure('26_row_cluster_profiles.png')
 plt.close()
-print("✓ Cluster profiles saved")
+logger.info("✓ Cluster profiles saved")
 
 # ============================================================================
 # Summary Statistics
 # ============================================================================
-print("\n" + "=" * 70)
-print("All visualizations generated successfully!")
-print("=" * 70)
-print("\nFiles created:")
-print("  - 26_row_vegetation_dendrogram.png")
-print("  - 26_row_clusters_spatial.png")
-print("  - 26_row_cluster_profiles.png")
-print("\nCluster Statistics:")
+logger.info("\n" + "=" * 70)
+logger.info("All visualizations generated successfully!")
+logger.info("=" * 70)
+logger.info("\nFiles created:")
+logger.info("  - 26_row_vegetation_dendrogram.png")
+logger.info("  - 26_row_clusters_spatial.png")
+logger.info("  - 26_row_cluster_profiles.png")
+logger.info("\nCluster Statistics:")
 for i in range(n_clusters):
     cluster_data = df_row[df_row['cluster_id'] == i]
-    print(f"\n  Cluster {i} ({names[i]}):")
-    print(f"    Tiles: {len(cluster_data)}")
-    print(f"    Avg NDVI: {cluster_data['ndvi_mean'].mean():.3f}")
-    print(f"    Avg Bare Soil: {cluster_data['bare_soil_fraction'].mean():.3f}")
-    print(f"    Avg Thermal Anomaly: {cluster_data['thermal_anomaly_score'].mean():.3f}")
+    logger.info(f"\n  Cluster {i} ({names[i]}):")
+    logger.info(f"    Tiles: {len(cluster_data)}")
+    logger.info(f"    Avg NDVI: {cluster_data['ndvi_mean'].mean():.3f}")
+    logger.info(f"    Avg Bare Soil: {cluster_data['bare_soil_fraction'].mean():.3f}")
+    logger.info(f"    Avg Thermal Anomaly: {cluster_data['thermal_anomaly_score'].mean():.3f}")
 
-print("\nOperational Summary:")
-print(f"  High-risk tiles (Clusters 1, 4): {len(df_row[df_row['cluster_id'].isin([1, 4])])}")
-print(f"  Standard monitoring (Clusters 0, 2, 3): {len(df_row[~df_row['cluster_id'].isin([1, 4])])}")
+logger.info("\nOperational Summary:")
+logger.info(f"  High-risk tiles (Clusters 1, 4): {len(df_row[df_row['cluster_id'].isin([1, 4])])}")
+logger.info(f"  Standard monitoring (Clusters 0, 2, 3): {len(df_row[~df_row['cluster_id'].isin([1, 4])])}")
 

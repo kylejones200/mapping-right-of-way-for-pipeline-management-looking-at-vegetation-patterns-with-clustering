@@ -1,6 +1,12 @@
 import sys
 import os
 
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 # Add parent directory to path to import plot_style
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from plot_style import set_tufte_defaults, apply_tufte_style, save_tufte_figure, COLORS
@@ -88,13 +94,13 @@ def create_main_embedding_space_plot():
     """
     Create t-SNE projection showing encroachment detection in embedding space.
     """
-    print("Generating main embedding space visualization...")
+    logger.info("Generating main embedding space visualization...")
     
     # Generate embeddings
     embeddings, labels = generate_embeddings_with_encroachment(n_images=5000)
     
     # t-SNE projection
-    print("  Running t-SNE dimensionality reduction...")
+    logger.info("  Running t-SNE dimensionality reduction...")
     tsne = TSNE(n_components=2, random_state=42, perplexity=30, max_iter=1000)
     embeddings_2d = tsne.fit_transform(embeddings)
     
@@ -154,15 +160,15 @@ def create_main_embedding_space_plot():
                 dpi=300, bbox_inches='tight')
     plt.close()
     
-    print(f"✓ Main embedding space visualization saved")
-    print(f"  Total images: {len(labels)}")
-    print(f"  Encroachments: {n_encroachment} ({n_encroachment/len(labels)*100:.1f}%)")
+    logger.info(f"✓ Main embedding space visualization saved")
+    logger.info(f"  Total images: {len(labels)}")
+    logger.info(f"  Encroachments: {n_encroachment} ({n_encroachment/len(labels)*100:.1f}%)")
 
 def create_temporal_encroachment_trend():
     """
     Create time series showing encroachment detection over time.
     """
-    print("Generating temporal encroachment trend visualization...")
+    logger.info("Generating temporal encroachment trend visualization...")
     
     np.random.seed(42)
     
@@ -239,27 +245,27 @@ def create_temporal_encroachment_trend():
                 dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("✓ Temporal encroachment trend visualization saved")
+    logger.info("✓ Temporal encroachment trend visualization saved")
 
 def main():
     """Generate all visualizations for Blog 15."""
     set_tufte_defaults()
-    print("="*70)
-    print("Blog 15: ROW Encroachment Detection - Visualizations")
-    print("="*70)
-    print()
+    logger.info("="*70)
+    logger.info("Blog 15: ROW Encroachment Detection - Visualizations")
+    logger.info("="*70)
+    logger.info()
     
     create_main_embedding_space_plot()
     create_temporal_encroachment_trend()
     
-    print()
-    print("="*70)
-    print("All visualizations generated successfully!")
-    print("="*70)
-    print()
-    print("Files created:")
-    print("  - 15_row_encroachment_dinov2_main.png")
-    print("  - 15_row_encroachment_temporal.png")
+    logger.info()
+    logger.info("="*70)
+    logger.info("All visualizations generated successfully!")
+    logger.info("="*70)
+    logger.info()
+    logger.info("Files created:")
+    logger.info("  - 15_row_encroachment_dinov2_main.png")
+    logger.info("  - 15_row_encroachment_temporal.png")
 
 if __name__ == "__main__":
     main()
