@@ -1,214 +1,136 @@
+---
+author: "Kyle Jones"
+date_published: "October 28, 2025"
+date_exported_from_medium: "November 10, 2025"
+canonical_link: "https://medium.com/@kyle-t-jones/mapping-right-of-way-for-pipeline-management-looking-at-vegetation-patterns-with-clustering-bf4e2614b24a"
+---
+
 # Mapping Right-of-Way for Pipeline Management Looking at Vegetation Patterns with Clustering A pipeline operator receives a vegetation management report for 150 km
 of right-of-way (ROW). The report lists 47 tiles where NDVI...
 
-::::::::::::### Mapping Right-of-Way for Pipeline Management Looking at Vegetation Patterns with Clustering 
+### Mapping Right-of-Way for Pipeline Management Looking at Vegetation Patterns with Clustering 
 
-A pipeline operator receives a vegetation management report for 150 km
-of right-of-way (ROW). The report lists 47 tiles where NDVI (vegetation
-index) exceeds 0.7. Management asks: "Which areas need trimming first?"
+A pipeline operator receives a vegetation management report for 150 km of right-of-way (ROW). The report lists 47 tiles where NDVI (vegetation index) exceeds 0.7. Management asks: "Which areas need trimming first?"
 
-The NDVI threshold doesn't answer this. A tile with NDVI=0.75 could be
-stable forest that's been there for decades, or it could be recent
-overgrowth encroaching on the pipeline. A tile with NDVI=0.65 might be
-below the threshold but showing rapid vegetation increase --- a leading
-indicator of future problems.
+The NDVI threshold doesn't answer this. A tile with NDVI=0.75 could be stable forest that's been there for decades, or it could be recent overgrowth encroaching on the pipeline. A tile with NDVI=0.65 might be below the threshold but showing rapid vegetation increase --- a leading indicator of future problems.
 
-Single-variable thresholds treat all high-NDVI tiles identically. They
-don't capture spatial context, temporal trends, or multivariate patterns
-(vegetation + thermal + soil disturbance).
+Single-variable thresholds treat all high-NDVI tiles identically. They don't capture spatial context, temporal trends, or multivariate patterns (vegetation + thermal + soil disturbance).
 
 
-Hierarchical clustering solves this. By grouping satellite tiles based
-on multiple features --- not just NDVI --- it reveals natural
-environmental zones that map to physical conditions: stable vegetation,
-recent disturbance, bare soil, construction activity. This article
-demonstrates a working implementation using Sentinel-2 imagery, Apache
-Spark, and Databricks Mosaic.
+Hierarchical clustering solves this. By grouping satellite tiles based on multiple features --- not just NDVI --- it reveals natural environmental zones that map to physical conditions: stable vegetation, recent disturbance, bare soil, construction activity. This article demonstrates a working implementation using Sentinel-2 imagery, Apache Spark, and Databricks Mosaic.
 
 ### Point-Based Thresholds vs. Spatial Patterns
 Let's consider two scenarios.
 
 Scenario 1: Two tiles both have NDVI = 0.70:
 
-- Tile A: Dense grassland, NDVI stable at 0.70 for 5 years, low texture
-  variance.
-- Tile B: Mixed shrubs, NDVI increased from 0.45 to 0.70 in 6 months,
-  high texture variance.
+- Tile A: Dense grassland, NDVI stable at 0.70 for 5 years, low texture variance.
+- Tile B: Mixed shrubs, NDVI increased from 0.45 to 0.70 in 6 months, high texture variance.
 
-A threshold-based system treats them identically. In reality, Tile B
-needs immediate vegetation management while Tile A is stable.
+A threshold-based system treats them identically. In reality, Tile B needs immediate vegetation management while Tile A is stable.
 
-Scenario 2: Three tiles all have NDVI \< 0.3 (below "overgrowth"
-threshold):
+Scenario 2: Three tiles all have NDVI \< 0.3 (below "overgrowth" threshold):
 
-- Tile C: Bare soil from recent ROW clearing (planned
-  maintenance).
-- Tile D: Exposed soil from third-party excavation (encroachment
-  risk).
+- Tile C: Bare soil from recent ROW clearing (planned maintenance).
+- Tile D: Exposed soil from third-party excavation (encroachment risk).
 - Tile E: Natural desert vegetation (stable, no action needed).
 
-All three are below the threshold, but root causes differ. Treating them
-uniformly wastes resources or misses critical risks.
+All three are below the threshold, but root causes differ. Treating them uniformly wastes resources or misses critical risks.
 
-Hierarchical clustering identifies groups of tiles with similar
-multivariate signatures using features like NDVI mean/std, texture,
-thermal anomaly, and bare soil fraction. The result: natural
-environmental zones that inform:
+Hierarchical clustering identifies groups of tiles with similar multivariate signatures using features like NDVI mean/std, texture, thermal anomaly, and bare soil fraction. The result: natural environmental zones that inform:
 
-- Patrol prioritization: High-risk zones (disturbed soil, thermal
-  anomalies) get weekly drone surveys; stable zones get quarterly
-  patrols.
-- Vegetation management: Clusters with increasing NDVI trend get
-  scheduled trimming; stable clusters get extended intervals.
-- Encroachment detection: Clusters showing bare soil + thermal
-  anomalies flag potential construction activity.
+- Patrol prioritization: High-risk zones (disturbed soil, thermal anomalies) get weekly drone surveys; stable zones get quarterly patrols.
+- Vegetation management: Clusters with increasing NDVI trend get scheduled trimming; stable clusters get extended intervals.
+- Encroachment detection: Clusters showing bare soil + thermal anomalies flag potential construction activity.
 
 ### Sentinel-2 with Databricks Mosaic
-Mosaic enables distributed geospatial processing on Databricks. The
-workflow ingests Sentinel-2 GeoTIFFs from cloud storage, computes NDVI
-per tile using the formula NDVI = (NIR --- Red) / (NIR + Red), and
-extracts additional features including texture metrics via Gray-Level
-Co-occurrence Matrix (GLCM) and bare soil fraction (NDVI \< 0.2).
+Mosaic enables distributed geospatial processing on Databricks. The workflow ingests Sentinel-2 GeoTIFFs from cloud storage, computes NDVI per tile using the formula NDVI = (NIR --- Red) / (NIR + Red), and extracts additional features including texture metrics via Gray-Level Co-occurrence Matrix (GLCM) and bare soil fraction (NDVI \< 0.2).
 
-*(See Implementation Section 1--3 for setup, ingestion, and feature
-extraction code)*
-::::### Feature Engineering 
+*(See Implementation Section 1--3 for setup, ingestion, and feature extraction code)*
+### Feature Engineering 
 
-Features are normalized using StandardScaler before clustering to ensure
-equal weighting. Without normalization, texture GLCM (range 0--50+)
-would dominate distance metrics over NDVI (range 0--1).
+Features are normalized using StandardScaler before clustering to ensure equal weighting. Without normalization, texture GLCM (range 0--50+) would dominate distance metrics over NDVI (range 0--1).
 
 Features used:
 
-- `ndvi_mean`: Average vegetation
-  index
-- `ndvi_std`: Vegetation
-  variability
-- `texture_glcm`: Spatial texture from
-  co-occurrence matrix
-- `thermal_anomaly_score`: Temperature
-  deviation from baseline
-- `bare_soil_fraction`: Proportion of
-  bare ground
+- `ndvi_mean`: Average vegetation index
+- `ndvi_std`: Vegetation variability
+- `texture_glcm`: Spatial texture from co-occurrence matrix
+- `thermal_anomaly_score`: Temperature deviation from baseline
+- `bare_soil_fraction`: Proportion of bare ground
 
 *(See Implementation Section 4 for normalization code)*
 
 ### Hierarchical Clustering
-Ward linkage is used to minimize within-cluster variance. The dendrogram
-visualization shows how tiles merge hierarchically, enabling informed
-selection of cluster count. Cutting at height=4 yields 5 distinct
-environmental zones.
+Ward linkage is used to minimize within-cluster variance. The dendrogram visualization shows how tiles merge hierarchically, enabling informed selection of cluster count. Cutting at height=4 yields 5 distinct environmental zones.
 
 
 Interpreting the dendrogram:
 
-- Y-axis (linkage distance): Height at which clusters merge. Larger
-  values = more dissimilar.
+- Y-axis (linkage distance): Height at which clusters merge. Larger values = more dissimilar.
 - Horizontal lines: Represent merges.
-- Color coding: Each color represents a final cluster at the chosen cut
-  height.
+- Color coding: Each color represents a final cluster at the chosen cut height.
 
-After clustering, cluster profiles are computed showing the mean feature
-values for each group.
+After clustering, cluster profiles are computed showing the mean feature values for each group.
 
 ### Cluster Interpretation and Operational Actions
 ### Cluster 0: "Dense, Stable Vegetation"
-- Characteristics: High NDVI (0.72), high texture (forest), low bare
-  soil.
-- Physical meaning: Mature forest or dense grassland, stable over
-  time.
-- Action: Standard quarterly patrol. Extend vegetation management
-  interval to 18 months.
+- Characteristics: High NDVI (0.72), high texture (forest), low bare soil.
+- Physical meaning: Mature forest or dense grassland, stable over time.
+- Action: Standard quarterly patrol. Extend vegetation management interval to 18 months.
 
 ### Cluster 1: "Bare or Disturbed Ground"
-- Characteristics: Very low NDVI (0.18), very high bare soil (0.72),
-  elevated thermal anomaly.
-- Physical meaning: Recent ROW clearing, construction, or natural
-  erosion.
-- Action: Immediate inspection. Verify if disturbance is planned (ROW
-  maintenance) or unplanned (third-party excavation). If unplanned,
-  dispatch ground crew within 24 hours.
+- Characteristics: Very low NDVI (0.18), very high bare soil (0.72), elevated thermal anomaly.
+- Physical meaning: Recent ROW clearing, construction, or natural erosion.
+- Action: Immediate inspection. Verify if disturbance is planned (ROW maintenance) or unplanned (third-party excavation). If unplanned, dispatch ground crew within 24 hours.
 
 ### Cluster 2: "Moderate Vegetation, Mixed Cover"
-- Characteristics: Mid-range NDVI (0.45), moderate texture, moderate
-  bare soil.
-- Physical meaning: Grassland with patches of exposed soil, typical of
-  semi-arid regions.
-- Action: Standard patrol. Monitor for NDVI trends. If NDVI increases
-  above 0.6 in next quarter, schedule trimming.
+- Characteristics: Mid-range NDVI (0.45), moderate texture, moderate bare soil.
+- Physical meaning: Grassland with patches of exposed soil, typical of semi-arid regions.
+- Action: Standard patrol. Monitor for NDVI trends. If NDVI increases above 0.6 in next quarter, schedule trimming.
 
 ### Cluster 3: "Healthy Vegetation, High Texture"
-- Characteristics: Moderate-high NDVI (0.55), high texture, low bare
-  soil.
-- Physical meaning: Mixed shrubs and trees, good vegetation
-  health.
-- Action: Quarterly patrol. No immediate action unless NDVI exceeds 0.7
-  (encroachment risk).
+- Characteristics: Moderate-high NDVI (0.55), high texture, low bare soil.
+- Physical meaning: Mixed shrubs and trees, good vegetation health.
+- Action: Quarterly patrol. No immediate action unless NDVI exceeds 0.7 (encroachment risk).
 
 ### Cluster 4: "Thermal Anomaly + Exposed Soil"
-- Characteristics: Low NDVI (0.32), high bare soil (0.58), high thermal
-  anomaly (0.42).
-- Physical meaning: Possible construction equipment, recent excavation,
-  or fire scar.
-- Action: URGENT: Encroachment alert. Dispatch aerial drone within 48
-  hours. Cross-reference with permit database. If no permit, issue
-  stop-work order.
+- Characteristics: Low NDVI (0.32), high bare soil (0.58), high thermal anomaly (0.42).
+- Physical meaning: Possible construction equipment, recent excavation, or fire scar.
+- Action: URGENT: Encroachment alert. Dispatch aerial drone within 48 hours. Cross-reference with permit database. If no permit, issue stop-work order.
 
 ### Spatial Visualization
-Cluster assignments are mapped along the ROW corridor, revealing spatial
-patterns. Dense vegetation (Cluster 0) dominates certain sections, while
-disturbed ground (Cluster 1) and thermal anomalies (Cluster 4)
-concentrate in specific locations requiring immediate attention.
+Cluster assignments are mapped along the ROW corridor, revealing spatial patterns. Dense vegetation (Cluster 0) dominates certain sections, while disturbed ground (Cluster 1) and thermal anomalies (Cluster 4) concentrate in specific locations requiring immediate attention.
 
 
 Spatial insights:
 
-- Cluster 1 (Bare/Disturbed): Concentrated at km 45--57 and km
-  102--107. Cross-reference with construction permits.
-- Cluster 4 (Thermal Anomaly): 5 tiles at km 102--107. Aerial drone
-  patrol identified bulldozer within 50m of pipeline (encroachment
-  confirmed).
-- Cluster 0 (Dense Veg): Dominates km 0--40 and km 120--150. These
-  zones can extend patrol interval from monthly to quarterly, saving
-  \$15K/year in patrol costs.
+- Cluster 1 (Bare/Disturbed): Concentrated at km 45--57 and km 102--107. Cross-reference with construction permits.
+- Cluster 4 (Thermal Anomaly): 5 tiles at km 102--107. Aerial drone patrol identified bulldozer within 50m of pipeline (encroachment confirmed).
+- Cluster 0 (Dense Veg): Dominates km 0--40 and km 120--150. These zones can extend patrol interval from monthly to quarterly, saving \$15K/year in patrol costs.
 
-Interactive maps created with Databricks Mosaic allow operators to click
-on tiles, filter by cluster ID, and overlay with pipeline centerline and
-recent inspection reports.
+Interactive maps created with Databricks Mosaic allow operators to click on tiles, filter by cluster ID, and overlay with pipeline centerline and recent inspection reports.
 
-*(See Implementation Section 7--8 for spatial visualization and Mosaic
-mapping code)*
-::::### Temporal Analysis: Tracking Cluster Migration 
+*(See Implementation Section 7--8 for spatial visualization and Mosaic mapping code)*
+### Temporal Analysis: Tracking Cluster Migration 
 
 A tile's cluster assignment can change over time as conditions evolve:
 
-- Vegetation regrowth after clearing (Cluster 1 → Cluster 2 → Cluster
-  3)
+- Vegetation regrowth after clearing (Cluster 1 → Cluster 2 → Cluster 3)
 - New construction (Cluster 0 → Cluster 4)
 - Seasonal vegetation cycles (Cluster 2 ↔ Cluster 3)
 
-Versioned Delta tables track cluster history, enabling detection of
-high-risk transitions. When tiles move from stable vegetation (Cluster
-0) to disturbed ground (Cluster 1 or 4), automatic alerts trigger
-emergency patrols.
+Versioned Delta tables track cluster history, enabling detection of high-risk transitions. When tiles move from stable vegetation (Cluster 0) to disturbed ground (Cluster 1 or 4), automatic alerts trigger emergency patrols.
 
-Operational alert: If 3+ tiles show this transition in the same 5 km
-stretch, trigger emergency patrol.
+Operational alert: If 3+ tiles show this transition in the same 5 km stretch, trigger emergency patrol.
 
 *(See Implementation Section 9--10 for temporal tracking SQL)*
 
 ### So What?
-Clustering helps us move beyond normal NDVI thresholds. It reveals
-natural environmental zones using multiple features, not just vegetation
-index. Dendrograms show us a visual hierarchy of how tiles merge,
-enabling informed choice of cluster count.
+Clustering helps us move beyond normal NDVI thresholds. It reveals natural environmental zones using multiple features, not just vegetation index. Dendrograms show us a visual hierarchy of how tiles merge, enabling informed choice of cluster count.
 
-We can use this approach to identify high-risk clusters (disturbed soil,
-thermal anomalies) and give those intensive monitoring; stable clusters
-get extended intervals. We can link thermal anomaly + bare soil
-signature to identif construction activity before it impacts the
-pipeline.
-::::### Implementation 
+We can use this approach to identify high-risk clusters (disturbed soil, thermal anomalies) and give those intensive monitoring; stable clusters get extended intervals. We can link thermal anomaly + bare soil signature to identif construction activity before it impacts the pipeline.
+### Implementation 
 
 ```python
 from pyspark.sql import SparkSession
@@ -566,10 +488,3 @@ plt.savefig('/dbfs/FileStore/row_spatial.png', dpi=300, bbox_inches='tight')
 plt.show()
 print('✓ Spatial map saved')
 ```
-::::::::::::::::::::By [Kyle Jones](https://medium.com/@kyle-t-jones) on
-[October 28, 2025](https://medium.com/p/bf4e2614b24a).
-
-[Canonical
-link](https://medium.com/@kyle-t-jones/mapping-right-of-way-for-pipeline-management-looking-at-vegetation-patterns-with-clustering-bf4e2614b24a)
-
-Exported from [Medium](https://medium.com) on November 10, 2025.
