@@ -90,7 +90,7 @@ def generate_embeddings_with_encroachment(n_images=5000):
     
     return embeddings, labels
 
-def create_main_embedding_space_plot():
+def create_main_embedding_space_plot(plot: bool = False):
     """
     Create t-SNE projection showing encroachment detection in embedding space.
     """
@@ -105,66 +105,67 @@ def create_main_embedding_space_plot():
     embeddings_2d = tsne.fit_transform(embeddings)
     
     # Create figure
-    fig, ax = plt.subplots(figsize=(10, 8))
+    if plot:
+        fig, ax = plt.subplots(figsize=(10, 8))
     
     # Define colors and labels
-    colors = {
-        0: '#CCCCCC',  # Gray for normal ROW
-        1: '#2ECC40',  # Green for vegetation
-        2: '#FF4136',  # Red for structures
-        3: '#FF851B'   # Orange for vehicles
-    }
+        colors = {
+            0: '#CCCCCC',  # Gray for normal ROW
+            1: '#2ECC40',  # Green for vegetation
+            2: '#FF4136',  # Red for structures
+            3: '#FF851B'   # Orange for vehicles
+        }
     
-    class_names = {
-        0: 'Normal ROW (Baseline)',
-        1: 'Vegetation Encroachment',
-        2: 'Structure Encroachment',
-        3: 'Vehicle/Activity'
-    }
+        class_names = {
+            0: 'Normal ROW (Baseline)',
+            1: 'Vegetation Encroachment',
+            2: 'Structure Encroachment',
+            3: 'Vehicle/Activity'
+        }
     
     # Plot each class
-    for class_id in [0, 1, 2, 3]:
-        mask = labels == class_id
-        ax.scatter(
-            embeddings_2d[mask, 0],
-            embeddings_2d[mask, 1],
-            c=colors[class_id],
-            label=class_names[class_id],
-            alpha=0.5 if class_id == 0 else 0.8,
-            s=15 if class_id == 0 else 40,
-            edgecolors='black',
-            linewidth=0.5
-        )
+        for class_id in [0, 1, 2, 3]:
+            mask = labels == class_id
+            ax.scatter(
+                embeddings_2d[mask, 0],
+                embeddings_2d[mask, 1],
+                c=colors[class_id],
+                label=class_names[class_id],
+                alpha=0.5 if class_id == 0 else 0.8,
+                s=15 if class_id == 0 else 40,
+                edgecolors='black',
+                linewidth=0.5
+            )
     
     # Apply minimalist style
-    apply_minimalist_style_manual(ax)
+        apply_minimalist_style_manual(ax)
     
     # Labels and title
-    ax.set_xlabel('t-SNE Dimension 1', fontsize=10)
-    ax.set_ylabel('t-SNE Dimension 2', fontsize=10)
-    ax.set_title('ROW Encroachment Detection via DINOv2 Embeddings', 
-                 fontsize=12, fontweight='bold', loc='left', pad=20)
+        ax.set_xlabel('t-SNE Dimension 1', fontsize=10)
+        ax.set_ylabel('t-SNE Dimension 2', fontsize=10)
+        ax.set_title('ROW Encroachment Detection via DINOv2 Embeddings', 
+                     fontsize=12, fontweight='bold', loc='left', pad=20)
     
     # Legend
-    ax.legend(loc='upper right', frameon=False, fontsize=9)
+        ax.legend(loc='upper right', frameon=False, fontsize=9)
     
     # Add annotation
-    n_encroachment = np.sum(labels > 0)
-    ax.text(0.02, 0.02, 
-            f'5,000 ROW images | 384-dim DINOv2 embeddings | {n_encroachment} encroachments ({n_encroachment/len(labels)*100:.1f}%)',
-            transform=ax.transAxes, fontsize=8, 
-            verticalalignment='bottom', color='black')
+        n_encroachment = np.sum(labels > 0)
+        ax.text(0.02, 0.02, 
+                f'5,000 ROW images | 384-dim DINOv2 embeddings | {n_encroachment} encroachments ({n_encroachment/len(labels)*100:.1f}%)',
+                transform=ax.transAxes, fontsize=8, 
+                verticalalignment='bottom', color='black')
     
-    plt.tight_layout()
-    plt.savefig('/Users/k.jones/Desktop/blogs/blog_posts/15_row_encroachment_dinov2_main.png', 
-                dpi=300, bbox_inches='tight')
-    plt.close()
+        plt.tight_layout()
+        plt.savefig('/Users/k.jones/Desktop/blogs/blog_posts/15_row_encroachment_dinov2_main.png', 
+                    dpi=300, bbox_inches='tight')
+        plt.close()
     
     logger.info(f"✓ Main embedding space visualization saved")
     logger.info(f"  Total images: {len(labels)}")
     logger.info(f"  Encroachments: {n_encroachment} ({n_encroachment/len(labels)*100:.1f}%)")
 
-def create_temporal_encroachment_trend():
+def create_temporal_encroachment_trend(plot: bool = False):
     """
     Create time series showing encroachment detection over time.
     """
@@ -200,50 +201,51 @@ def create_temporal_encroachment_trend():
     total = vegetation + structure + vehicle
     
     # Create figure
-    fig, ax = plt.subplots(figsize=(12, 6))
+    if plot:
+        fig, ax = plt.subplots(figsize=(12, 6))
     
     # Stacked area plot
-    ax.fill_between(months, 0, vehicle, 
-                    color='black', alpha=0.7, label='Vehicle/Activity',
-                    edgecolor='black', linewidth=0.5)
+        ax.fill_between(months, 0, vehicle, 
+                        color='black', alpha=0.7, label='Vehicle/Activity',
+                        edgecolor='black', linewidth=0.5)
     
-    ax.fill_between(months, vehicle, vehicle + structure,
-                    color='black', alpha=0.7, label='Structure Encroachment',
-                    edgecolor='black', linewidth=0.5)
+        ax.fill_between(months, vehicle, vehicle + structure,
+                        color='black', alpha=0.7, label='Structure Encroachment',
+                        edgecolor='black', linewidth=0.5)
     
-    ax.fill_between(months, vehicle + structure, total,
-                    color='black', alpha=0.7, label='Vegetation Encroachment',
-                    edgecolor='black', linewidth=0.5)
+        ax.fill_between(months, vehicle + structure, total,
+                        color='black', alpha=0.7, label='Vegetation Encroachment',
+                        edgecolor='black', linewidth=0.5)
     
     # Total line
-    ax.plot(months, total, 'k-', linewidth=2, label='Total Encroachment', zorder=5)
+        ax.plot(months, total, 'k-', linewidth=2, label='Total Encroachment', zorder=5)
     
     # Apply minimalist style
-    apply_minimalist_style_manual(ax)
+        apply_minimalist_style_manual(ax)
     
-    ax.set_xlabel('Month', fontsize=11)
-    ax.set_ylabel('Encroachment Rate (% of ROW)', fontsize=11)
-    ax.set_title('ROW Encroachment Trends Over Time', 
-                 fontsize=13, fontweight='bold', loc='left', pad=20)
+        ax.set_xlabel('Month', fontsize=11)
+        ax.set_ylabel('Encroachment Rate (% of ROW)', fontsize=11)
+        ax.set_title('ROW Encroachment Trends Over Time', 
+                     fontsize=13, fontweight='bold', loc='left', pad=20)
     
     # X-axis labels
-    ax.set_xticks(months[::2])
-    ax.set_xticklabels([f"{month_labels[i]}\n{'2023' if i < 12 else '2024'}" 
-                        for i in range(0, 24, 2)], fontsize=9)
+        ax.set_xticks(months[::2])
+        ax.set_xticklabels([f"{month_labels[i]}\n{'2023' if i < 12 else '2024'}" 
+                            for i in range(0, 24, 2)], fontsize=9)
     
-    ax.legend(loc='upper left', frameon=False, fontsize=9)
+        ax.legend(loc='upper left', frameon=False, fontsize=9)
     
     # Add annotation for growing trend
-    ax.annotate('Growing Vegetation\nEncroachment Trend', 
-               xy=(18, total[18]), xytext=(14, total[18] + 3),
-               arrowprops=dict(arrowstyle='->', color='black', lw=1.5),
-               fontsize=9, bbox=dict(boxstyle='round', facecolor='white', 
-                                    edgecolor='black', linewidth=1))
+        ax.annotate('Growing Vegetation\nEncroachment Trend', 
+                   xy=(18, total[18]), xytext=(14, total[18] + 3),
+                   arrowprops=dict(arrowstyle='->', color='black', lw=1.5),
+                   fontsize=9, bbox=dict(boxstyle='round', facecolor='white', 
+                                        edgecolor='black', linewidth=1))
     
-    plt.tight_layout()
-    plt.savefig('/Users/k.jones/Desktop/blogs/blog_posts/15_row_encroachment_temporal.png', 
-                dpi=300, bbox_inches='tight')
-    plt.close()
+        plt.tight_layout()
+        plt.savefig('/Users/k.jones/Desktop/blogs/blog_posts/15_row_encroachment_temporal.png', 
+                    dpi=300, bbox_inches='tight')
+        plt.close()
     
     logger.info("✓ Temporal encroachment trend visualization saved")
 
