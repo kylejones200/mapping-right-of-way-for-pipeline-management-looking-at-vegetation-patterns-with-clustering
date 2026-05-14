@@ -79,10 +79,10 @@ Hierarchical clustering identifies groups of tiles with similar multivariate sig
 └─────────────────────────┘
 ```
 
-**Key components:**
-- **Mosaic:** Databricks library for distributed geospatial analytics at scale.
-- **Sentinel-2:** Free, open-source satellite imagery with 10m resolution and 5-day revisit.
-- **SciPy dendrograms:** Visual hierarchy showing how tiles merge into clusters.
+Key components:
+- Mosaic: Databricks library for distributed geospatial analytics at scale.
+- Sentinel-2: Free, open-source satellite imagery with 10m resolution and 5-day revisit.
+- SciPy dendrograms: Visual hierarchy showing how tiles merge into clusters.
 
 ---
 
@@ -115,14 +115,14 @@ Features used:
 
 Ward linkage is used to minimize within-cluster variance. The dendrogram visualization shows how tiles merge hierarchically, enabling informed selection of cluster count. Cutting at height=4 yields 5 distinct environmental zones.
 
-**Interpreting the dendrogram:**
-- **Y-axis (linkage distance):** Height at which clusters merge. Larger values = more dissimilar.
-- **Horizontal lines:** Represent merges. 
-- **Color coding:** Each color represents a final cluster at the chosen cut height.
+Interpreting the dendrogram:
+- Y-axis (linkage distance): Height at which clusters merge. Larger values = more dissimilar.
+- Horizontal lines: Represent merges. 
+- Color coding: Each color represents a final cluster at the chosen cut height.
 
 After clustering, cluster profiles are computed showing the mean feature values for each group.
 
-**Example cluster profiles:**
+Example cluster profiles:
 
 | cluster_id | ndvi_mean | ndvi_std | texture | thermal_anom | bare_frac | count |
 |------------|-----------|----------|---------|--------------|-----------|-------|
@@ -166,10 +166,10 @@ Cluster assignments are mapped along the ROW corridor, revealing spatial pattern
 
 ![ROW Clusters Spatial Distribution](26_row_clusters_spatial.png)
 
-**Spatial insights:**
-- **Cluster 1 (Bare/Disturbed):** Concentrated at km 45-57 and km 102-107. Cross-reference with construction permits.
-- **Cluster 4 (Thermal Anomaly):** 5 tiles at km 102-107. Aerial drone patrol identified bulldozer within 50m of pipeline (encroachment confirmed).
-- **Cluster 0 (Dense Veg):** Dominates km 0-40 and km 120-150. These zones can extend patrol interval from monthly to quarterly, saving $15K/year in patrol costs.
+Spatial insights:
+- Cluster 1 (Bare/Disturbed): Concentrated at km 45-57 and km 102-107. Cross-reference with construction permits.
+- Cluster 4 (Thermal Anomaly): 5 tiles at km 102-107. Aerial drone patrol identified bulldozer within 50m of pipeline (encroachment confirmed).
+- Cluster 0 (Dense Veg): Dominates km 0-40 and km 120-150. These zones can extend patrol interval from monthly to quarterly, saving $15K/year in patrol costs.
 
 Interactive maps created with Databricks Mosaic allow operators to click on tiles, filter by cluster ID, and overlay with pipeline centerline and recent inspection reports.
 
@@ -186,7 +186,7 @@ A tile's cluster assignment can change over time as conditions evolve:
 
 Versioned Delta tables track cluster history, enabling detection of high-risk transitions. When tiles move from stable vegetation (Cluster 0) to disturbed ground (Cluster 1 or 4), automatic alerts trigger emergency patrols.
 
-**Operational alert:** If 3+ tiles show this transition in the same 5 km stretch, trigger emergency patrol.
+Operational alert: If 3+ tiles show this transition in the same 5 km stretch, trigger emergency patrol.
 
 *(See Implementation Section 9-10 for temporal tracking SQL)*
 
@@ -196,38 +196,38 @@ Versioned Delta tables track cluster history, enabling detection of high-risk tr
 
 ### 150 km Natural Gas Pipeline in Texas
 
-**Before clustering:**
+Before clustering:
 - Monthly aerial patrols for entire 150 km ROW: $12K/month × 12 = $144K/year
 - Uniform vegetation trimming schedule: $180K/year
 - 4 encroachment incidents detected after construction began (average response cost: $75K)
-- **Total annual cost:** $324K + 4 × $75K = $624K
+- Total annual cost: $324K + 4 × $75K = $624K
 
-**After implementing cluster-based ROW management:**
+After implementing cluster-based ROW management:
 
-1. **Differentiated patrol schedules:**
+1. Differentiated patrol schedules:
    - Cluster 0 (Dense Veg, 42 tiles): Quarterly patrol → 4 patrols/year
    - Cluster 1 (Disturbed, 28 tiles): Weekly drone surveillance → 52 patrols/year
    - Cluster 2 (Mixed, 35 tiles): Monthly patrol → 12 patrols/year
    - Cluster 3 (Healthy, 30 tiles): Quarterly patrol → 4 patrols/year
-   - Cluster 4 (Thermal Anomaly, 15 tiles): **Immediate response** → unscheduled
+   - Cluster 4 (Thermal Anomaly, 15 tiles): Immediate response → unscheduled
 
-2. **Targeted vegetation management:**
+2. Targeted vegetation management:
    - Focus trimming on Clusters 0 and 3 where NDVI > 0.65.
    - Skip trimming in Clusters 1 and 2 (already bare or sparse vegetation).
-   - **Trimming cost:** $180K → $95K (47% reduction)
+   - Trimming cost: $180K → $95K (47% reduction)
 
-3. **Proactive encroachment detection:**
-   - Cluster 4 alerts identified 3 encroachments **before construction started** (early warning from thermal anomaly).
+3. Proactive encroachment detection:
+   - Cluster 4 alerts identified 3 encroachments before construction started (early warning from thermal anomaly).
    - One confirmed encroachment responded to immediately (Cluster 1 transition alert).
-   - **Encroachment response cost:** 4 × $75K → 1 × $25K (83% reduction)
+   - Encroachment response cost: 4 × $75K → 1 × $25K (83% reduction)
 
-4. **Results after 12 months:**
-   - **Patrol cost:** $144K → $78K (46% savings)
-   - **Trimming cost:** $180K → $95K (47% savings)
-   - **Encroachment cost:** $300K → $25K (92% savings)
-   - **Total cost:** $624K → $198K (**$426K annual savings, 68% reduction**)
+4. Results after 12 months:
+   - Patrol cost: $144K → $78K (46% savings)
+   - Trimming cost: $180K → $95K (47% savings)
+   - Encroachment cost: $300K → $25K (92% savings)
+   - Total cost: $624K → $198K ($426K annual savings, 68% reduction)
 
-5. **Safety improvements:**
+5. Safety improvements:
    - Zero encroachment-related near-miss incidents (down from 4)
    - Regulator commended proactive monitoring during annual inspection
 
@@ -312,7 +312,7 @@ df_rasters.createOrReplaceTempView('sentinel2_raw')
 
 ### Section 3: Compute NDVI and Features
 
-**NDVI Computation:**
+NDVI Computation:
 
 ```sql
 CREATE OR REPLACE TABLE silver.row_tile_ndvi AS
@@ -326,7 +326,7 @@ FROM sentinel2_raw
 GROUP BY tile_id, geometry;
 ```
 
-**Texture Metrics (GLCM):**
+Texture Metrics (GLCM):
 
 ```python
 from pyspark.sql.functions import udf
@@ -346,7 +346,7 @@ def compute_texture_glcm(nir_band):
 df_texture = df_rasters.withColumn('texture_glcm', compute_texture_glcm('band_nir'))
 ```
 
-**Bare Soil Fraction:**
+Bare Soil Fraction:
 
 ```python
 df_features = spark.sql("""
@@ -363,7 +363,7 @@ GROUP BY tile_id, ndvi_mean, ndvi_std
 """)
 ```
 
-**Synthetic Demo Data:**
+Synthetic Demo Data:
 
 ```python
 import pandas as pd
@@ -704,15 +704,15 @@ print('✓ Spatial map saved')
 
 ## Further Reading
 
-- **Databricks Mosaic:** [databricks.com/product/mosaic](https://www.databricks.com/product/mosaic)
-- **Sentinel-2 Data:** [scihub.copernicus.eu](https://scihub.copernicus.eu/)
-- **SciPy Hierarchical Clustering:** [docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html](https://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html)
-- **GLCM Texture:** [scikit-image.org/docs/stable/auto_examples/features_detection/plot_glcm.html](https://scikit-image.org/docs/stable/auto_examples/features_detection/plot_glcm.html)
-- **PHMSA Pipeline Safety:** [phmsa.dot.gov/pipeline](https://www.phmsa.dot.gov/pipeline)
+- Databricks Mosaic: [databricks.com/product/mosaic](https://www.databricks.com/product/mosaic)
+- Sentinel-2 Data: [scihub.copernicus.eu](https://scihub.copernicus.eu/)
+- SciPy Hierarchical Clustering: [docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html](https://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html)
+- GLCM Texture: [scikit-image.org/docs/stable/auto_examples/features_detection/plot_glcm.html](https://scikit-image.org/docs/stable/auto_examples/features_detection/plot_glcm.html)
+- PHMSA Pipeline Safety: [phmsa.dot.gov/pipeline](https://www.phmsa.dot.gov/pipeline)
 
 ---
 
-**About This Analysis**: All code is working and tested on Databricks Runtime 14.3 LTS with Mosaic 0.4+. The clustering methodology is validated against field patrol data from 3 midstream operators. For consulting inquiries, reach out via LinkedIn.
+About This Analysis: All code is working and tested on Databricks Runtime 14.3 LTS with Mosaic 0.4+. The clustering methodology is validated against field patrol data from 3 midstream operators. For consulting inquiries, reach out via LinkedIn.
 
 
 ---
