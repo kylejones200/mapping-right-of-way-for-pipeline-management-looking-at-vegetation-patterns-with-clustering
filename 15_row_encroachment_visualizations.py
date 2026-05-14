@@ -252,18 +252,14 @@ def create_temporal_encroachment_trend(plot: bool = False):
 def main():
     """Generate all visualizations for Blog 15."""
     set_tufte_defaults()
-    logger.info("="*70)
     logger.info("Blog 15: ROW Encroachment Detection - Visualizations")
-    logger.info("="*70)
     logger.info()
     
     create_main_embedding_space_plot()
     create_temporal_encroachment_trend()
     
     logger.info()
-    logger.info("="*70)
     logger.info("All visualizations generated successfully!")
-    logger.info("="*70)
     logger.info()
     logger.info("Files created:")
     logger.info("  - 15_row_encroachment_dinov2_main.png")

@@ -38,9 +38,7 @@ from tda_utils import setup_tufte_plot, TufteColors
 
 
 
-logger.info("=" * 70)
 logger.info("Blog 26: ROW Vegetation Clustering - Visualizations")
-logger.info("=" * 70)
 
 plt.rcParams['font.family'] = 'serif'
 
@@ -215,9 +213,7 @@ logger.info("✓ Cluster profiles saved")
 # ============================================================================
 # Summary Statistics
 # ============================================================================
-logger.info("\n" + "=" * 70)
-logger.info("All visualizations generated successfully!")
-logger.info("=" * 70)
+logger.info("=== All visualizations generated successfully! ===")
 logger.info("\nFiles created:")
 logger.info("  - 26_row_vegetation_dendrogram.png")
 logger.info("  - 26_row_clusters_spatial.png")
