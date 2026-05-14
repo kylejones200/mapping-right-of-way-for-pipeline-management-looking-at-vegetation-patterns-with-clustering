@@ -1,3 +1,4 @@
+import signalplot
 import sys
 import os
 
@@ -7,9 +8,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-# Add parent directory to path to import plot_style
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from plot_style import set_tufte_defaults, apply_tufte_style, save_tufte_figure, COLORS
 
 """
 Blog 26: ROW Vegetation Clustering - Visualization Generator
@@ -24,19 +22,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import AgglomerativeClustering
 
 
-# Add parent directory to path to import plot_style
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import Tufte plotting utilities
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from tda_utils import setup_tufte_plot, TufteColors
-
-
-
 logger.info("Blog 26: ROW Vegetation Clustering - Visualizations")
 
-plt.rcParams['font.family'] = 'serif'
 
 # ============================================================================
 # Generate Synthetic ROW Tile Data
@@ -87,7 +76,7 @@ logger.info(f"✓ Generated {len(df_row)} tiles")
 # ============================================================================
 logger.info("\nGenerating ROW vegetation dendrogram...")
 
-set_tufte_defaults()
+signalplot.apply(font_family='serif')
 
 features = ['ndvi_mean', 'ndvi_std', 'texture_glcm', 
             'thermal_anomaly_score', 'bare_soil_fraction']
@@ -102,18 +91,18 @@ fig, ax = plt.subplots(figsize=(12, 5))
 
 dendrogram(Z, ax=ax, truncate_mode='level', p=6, 
            color_threshold=4,
-           above_threshold_color=COLORS['black'], 
+           above_threshold_color="#2b2b2b", 
            no_labels=True,
-           link_color_func=lambda k: COLORS['black'])
+           link_color_func=lambda k: "#2b2b2b")
 
 ax.set_xlabel('Tile Index (sorted by similarity)')
 ax.set_ylabel('Linkage Distance')
 ax.set_title('ROW Environmental Clusters Dendrogram', pad=15)
 
-apply_tufte_style(ax, show_grid=False)
+signalplot.tidy_axes(ax)
 
 plt.tight_layout()
-save_tufte_figure('26_row_vegetation_dendrogram.png')
+signalplot.save('26_row_vegetation_dendrogram.png')
 plt.close()
 logger.info("✓ Dendrogram saved")
 
@@ -141,7 +130,7 @@ for i in range(n_clusters):
     ax.scatter(cluster_data['chainage_km'], cluster_data['ndvi_mean'],
                c=str(gray_value), label=f'C{i}: {names[i]}',
                marker=markers[i], s=sizes[i], alpha=alphas[i], 
-               edgecolors=COLORS['black'], linewidth=0.8)
+               edgecolors="#2b2b2b", linewidth=0.8)
 
 ax.set_xlabel('Chainage (km)')
 ax.set_ylabel('NDVI (0-1)')
@@ -149,13 +138,13 @@ ax.set_title('ROW Vegetation Clusters by Location', pad=15)
 ax.legend(loc='upper left', frameon=False, ncol=5)
 
 # Add threshold line (use accent color to call out critical value)
-ax.axhline(y=0.7, color=COLORS['accent_blue'], linestyle='--', linewidth=1.5, 
+ax.axhline(y=0.7, color="#2980b9", linestyle='--', linewidth=1.5, 
            alpha=0.7, label='NDVI threshold')
 
-apply_tufte_style(ax, show_grid=False)
+signalplot.tidy_axes(ax)
 
 plt.tight_layout()
-save_tufte_figure('26_row_clusters_spatial.png')
+signalplot.save('26_row_clusters_spatial.png')
 plt.close()
 logger.info("✓ Spatial distribution map saved")
 
@@ -171,38 +160,38 @@ fig, axes = plt.subplots(1, 3, figsize=(14, 4))
 # Plot 1: NDVI mean by cluster
 ax1 = axes[0]
 bars1 = ax1.bar(range(n_clusters), cluster_profiles['ndvi_mean'], 
-                color=COLORS['white'], edgecolor=COLORS['black'], 
+                color="#ffffff", edgecolor="#2b2b2b", 
                 linewidth=1.5, alpha=0.9)
 ax1.set_ylabel('NDVI Mean')
 ax1.set_title('Vegetation Density', pad=15)
 ax1.set_xticks(range(n_clusters))
 ax1.set_xticklabels([f'C{i}' for i in range(n_clusters)])
-apply_tufte_style(ax1, show_grid=False)
+signalplot.tidy_axes(ax1)
 
 # Plot 2: Bare soil fraction by cluster
 ax2 = axes[1]
 bars2 = ax2.bar(range(n_clusters), cluster_profiles['bare_soil_fraction'], 
-                color=COLORS['white'], edgecolor=COLORS['black'], 
+                color="#ffffff", edgecolor="#2b2b2b", 
                 linewidth=1.5, alpha=0.9)
 ax2.set_ylabel('Bare Soil Fraction')
 ax2.set_title('Soil Exposure', pad=15)
 ax2.set_xticks(range(n_clusters))
 ax2.set_xticklabels([f'C{i}' for i in range(n_clusters)])
-apply_tufte_style(ax2, show_grid=False)
+signalplot.tidy_axes(ax2)
 
 # Plot 3: Thermal anomaly score by cluster
 ax3 = axes[2]
 bars3 = ax3.bar(range(n_clusters), cluster_profiles['thermal_anomaly_score'], 
-                color=COLORS['white'], edgecolor=COLORS['black'], 
+                color="#ffffff", edgecolor="#2b2b2b", 
                 linewidth=1.5, alpha=0.9)
 ax3.set_ylabel('Thermal Anomaly Score')
 ax3.set_title('Thermal Signature', pad=15)
 ax3.set_xticks(range(n_clusters))
 ax3.set_xticklabels([f'C{i}' for i in range(n_clusters)])
-apply_tufte_style(ax3, show_grid=False)
+signalplot.tidy_axes(ax3)
 
 plt.tight_layout()
-save_tufte_figure('26_row_cluster_profiles.png')
+signalplot.save('26_row_cluster_profiles.png')
 plt.close()
 logger.info("✓ Cluster profiles saved")
 
