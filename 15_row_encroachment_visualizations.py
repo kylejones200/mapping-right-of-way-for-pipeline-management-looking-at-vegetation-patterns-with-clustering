@@ -22,12 +22,9 @@ from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 import warnings
 
-import sys
-import os
 
 # Add parent directory to path to import plot_style
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from plot_style import set_tufte_defaults, apply_tufte_style, save_tufte_figure, COLORS
 
 warnings.filterwarnings('ignore')
 
