@@ -1,6 +1,4 @@
 import signalplot
-import sys
-import os
 
 import logging
 logging.basicConfig(
@@ -23,7 +21,6 @@ from sklearn.cluster import AgglomerativeClustering
 
 
 
-from pathlib import Path
 np.random.seed(9)
 logger.info("Blog 26: ROW Vegetation Clustering - Visualizations")
 
