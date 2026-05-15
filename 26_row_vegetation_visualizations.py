@@ -24,6 +24,7 @@ from sklearn.cluster import AgglomerativeClustering
 
 
 from pathlib import Path
+np.random.seed(9)
 logger.info("Blog 26: ROW Vegetation Clustering - Visualizations")
 
 
@@ -32,7 +33,6 @@ logger.info("Blog 26: ROW Vegetation Clustering - Visualizations")
 # ============================================================================
 logger.info("\nGenerating synthetic ROW tile data...")
 
-np.random.seed(9)
 N_tiles = 150
 
 df_row = pd.DataFrame({
