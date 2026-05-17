@@ -50,25 +50,25 @@ def generate_embeddings_with_encroachment(n_images=5000):
 
     # Normal ROW (tight cluster)
     normal_embeddings = np.random.randn(n_normal, 384) * 0.25
-    pd.concat([embeddings, normal_embeddings])
+    embeddings.append(normal_embeddings)
     labels.extend([0] * n_normal)
 
     # Vegetation encroachment (separate cluster)
     veg_center = np.ones(384) * 0.6
     veg_embeddings = np.random.randn(n_vegetation, 384) * 0.35 + veg_center
-    pd.concat([embeddings, veg_embeddings])
+    embeddings.append(veg_embeddings)
     labels.extend([1] * n_vegetation)
 
     # Structure encroachment (outliers)
     struct_center = np.ones(384) * 1.3
     struct_embeddings = np.random.randn(n_structure, 384) * 0.5 + struct_center
-    pd.concat([embeddings, struct_embeddings])
+    embeddings.append(struct_embeddings)
     labels.extend([2] * n_structure)
 
     # Vehicle/activity (outliers)
     vehicle_center = np.ones(384) * -0.9
     vehicle_embeddings = np.random.randn(n_vehicle, 384) * 0.4 + vehicle_center
-    pd.concat([embeddings, vehicle_embeddings])
+    embeddings.append(vehicle_embeddings)
     labels.extend([3] * n_vehicle)
 
     embeddings = np.vstack(embeddings)
