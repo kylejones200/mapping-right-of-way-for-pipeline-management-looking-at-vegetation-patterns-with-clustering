@@ -1,0 +1,24 @@
+[project]
+name = "mapping-right-of-way-for-pipeline-management-looking-at-vegetation-patterns-with"
+version = "0.1.0"
+description = "Companion code for Medium article: mapping right of way for pipeline management looking at vegetation patterns with clustering"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.9",
+    "numpy>=2.4.4",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+    "signalplot>=0.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
