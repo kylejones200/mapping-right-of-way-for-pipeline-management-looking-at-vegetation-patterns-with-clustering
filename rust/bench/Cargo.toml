@@ -1,0 +1,13 @@
+[package]
+name = "mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_bench"
+description = "Standalone Rust benchmark (no Python)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bench"
+path = "src/main.rs"
+
+[dependencies]
+mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_core = { path = "../core" }

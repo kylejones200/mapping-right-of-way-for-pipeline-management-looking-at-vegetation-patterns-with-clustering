@@ -1,0 +1,9 @@
+[package]
+name = "mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_core"
+description = "Synthetic NDVI tile features"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

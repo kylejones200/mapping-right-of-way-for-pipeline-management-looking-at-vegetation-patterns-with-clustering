@@ -1,0 +1,15 @@
+[package]
+name = "mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_rs"
+description = "Python bindings (PyO3) for mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+mapping_right_of_way_for_pipeline_management_looking_at_vegetation_patterns_with_clustering_core = { path = "../core" }
+pyo3 = { version = "0.28", features = ["extension-module"] }
+numpy = "0.28"
