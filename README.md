@@ -11,14 +11,7 @@ The NDVI threshold doesn't answer this. A tile with NDVI=0.75 could be stable fo
 
 Single-variable thresholds treat all high-NDVI tiles identically. They don't capture spatial context, temporal trends, or multivariate patterns (vegetation + thermal + soil disturbance).
 
-## About
 
-Place the code for this article in this repository.
-The original article export is saved as `article.md`.
-
-## Files
-
-Add your `.ipynb`, `.py`, `.yaml`, `.js`, `.ts`, or other project files here.
 
 ## Rust performance port
 
